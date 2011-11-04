@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mixpanel.NET", "Mixpanel.NET.csproj", "{352023D1-2498-44E2-B2A8-340FA959FEDE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mixpanel.NET.specs", "..\Mixpanel.NET.specs\Mixpanel.NET.specs.csproj", "{08422141-78C4-405A-81C5-926A914B8B40}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{352023D1-2498-44E2-B2A8-340FA959FEDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{352023D1-2498-44E2-B2A8-340FA959FEDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{352023D1-2498-44E2-B2A8-340FA959FEDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08422141-78C4-405A-81C5-926A914B8B40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08422141-78C4-405A-81C5-926A914B8B40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08422141-78C4-405A-81C5-926A914B8B40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08422141-78C4-405A-81C5-926A914B8B40}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

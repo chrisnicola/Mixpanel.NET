@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>395c6283-608d-48ee-8d12-7dc9fad81595</ProjectGuid>
+    <ProjectGuid>{08422141-78C4-405A-81C5-926A914B8B40}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Mixpanel.NET.specs</RootNamespace>
@@ -31,6 +31,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Castle.Core">
+      <HintPath>..\Mixpanel.NET\packages\Castle.Core.2.5.2\lib\NET35\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="FakeItEasy">
+      <HintPath>..\Mixpanel.NET\packages\FakeItEasy.1.7.4166.27\lib\NET40\FakeItEasy.dll</HintPath>
+    </Reference>
+    <Reference Include="Machine.Fakes">
+      <HintPath>..\Mixpanel.NET\packages\Machine.Fakes.0.2.6\lib\Machine.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="Machine.Fakes.Adapters.FakeItEasy">
+      <HintPath>..\Mixpanel.NET\packages\Machine.Fakes.FakeItEasy.0.2.6\lib\Machine.Fakes.Adapters.FakeItEasy.dll</HintPath>
+    </Reference>
+    <Reference Include="Machine.Specifications">
+      <HintPath>..\Mixpanel.NET\packages\Machine.Specifications.0.4.24.0\lib\Machine.Specifications.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,8 +55,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Integration\MixPanelSpecs.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mixpanel.NET\Mixpanel.NET.csproj">
+      <Project>{352023D1-2498-44E2-B2A8-340FA959FEDE}</Project>
+      <Name>Mixpanel.NET</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
