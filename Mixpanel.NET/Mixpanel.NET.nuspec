@@ -6,7 +6,7 @@
     <title>Mixpanel API integration for .NET</title>
     <authors>Chris Nicola</authors>
     <owners>Chris Nicola</owners>
-    <licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl>
+    <licenseUrl>http://github.com/lucisferre/Mixpanel.Net/tree/master/licence.txt</licenseUrl>
     <projectUrl>http://github.com/lucisferre/Mixpanel.NET</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides API hooks for the Mixpanel API</description>
