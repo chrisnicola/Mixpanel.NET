@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Web.Script.Serialization;
 using FakeItEasy;
 using Machine.Specifications;
-using Mixpanel.NET;
 
-namespace Mixpanel.NET.specs.Unit
-{
-  public class tracker_context
-  {
-    Establish that = () =>
-    {
+namespace Mixpanel.NET.Specs.Unit {
+  public class tracker_context {
+    Establish that = () => {
       FakeHttp = A.Fake<IMixpanelHttp>();
       A.CallTo(() => FakeHttp.Get(A<string>.That.Matches(x => ValidUriCheck(x))))
         .Invokes(x => SetSentData(x.GetArgument<string>(0)))
@@ -21,16 +16,14 @@ namespace Mixpanel.NET.specs.Unit
       Tracker = new Tracker("Your mixpanel token", FakeHttp);
     };
   
-    static bool ValidUriCheck(string location)
-    {
+    static bool ValidUriCheck(string location) {
       if (string.IsNullOrWhiteSpace(location)) return false;
       if (!Uri.IsWellFormedUriString(location, UriKind.Absolute)) return false;
       if (!location.StartsWith(Resources.BaseUrl)) return false;
       return true;
     }
     
-    static void SetSentData(string data)
-    {
+    static void SetSentData(string data) {
       SentData = data.UriParameters()["data"].Base64Decode();
     }
 
@@ -39,10 +32,8 @@ namespace Mixpanel.NET.specs.Unit
     protected static string SentData;
   }
 
-  public class when_sending_tracker_data_using_a_dictionary : tracker_context
-  {
-    Because of = () =>
-    {
+  public class when_sending_tracker_data_using_a_dictionary : tracker_context {
+    Because of = () => {
       var properties = new Dictionary<string, object> {{"prop1", 0}, {"prop2", "string"}};
       _result = Tracker.Track("Test", properties, true);
     };
@@ -52,11 +43,10 @@ namespace Mixpanel.NET.specs.Unit
     It should_send_the_dictionary_property_1 = () => SentData.ShouldHaveProperty("prop1", 0);
     It should_send_the_dictionary_property_2 = () => SentData.ShouldHaveProperty("prop2", "string");
 
-    static Tracker _panel;
     static bool _result;
   }
 
-  public class when_sending_tracker_data_using_an_object : tracker_context {
+  public class when_sending_tracker_data_using_an_object_with_default_naming_conventions : tracker_context {
     Because of = () => {
       _event = new MyEvent {
         PropertyOne = 0, PropertyTwoFour = "string"
@@ -85,15 +75,10 @@ namespace Mixpanel.NET.specs.Unit
     It should_track_successfully = () => _result.ShouldBeTrue();
     It should_send_the_event_name = () => SentData.ShouldHaveName("MyEvent");
     It should_send_property_one = () => SentData.ShouldHaveProperty("PropertyOne", _event.PropertyOne);
-    It should_send_property_two = () => SentData.ShouldHaveProperty("PropertyTwo", _event.PropertyTwoFour);
+    It should_send_property_two = () => SentData.ShouldHaveProperty("PropertyTwoFour", _event.PropertyTwoFour);
 
     static MyEvent _event;
     static bool _result;
-  }
-
-  public class when_sending_tracker_data_with_conventions : tracker_context {
-
-    
   }
 
   class MyEvent {

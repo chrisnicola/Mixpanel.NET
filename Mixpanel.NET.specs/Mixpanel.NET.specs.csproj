@@ -8,8 +8,8 @@
     <ProjectGuid>{08422141-78C4-405A-81C5-926A914B8B40}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Mixpanel.NET.specs</RootNamespace>
-    <AssemblyName>Mixpanel.NET.specs</AssemblyName>
+    <RootNamespace>Mixpanel.NET.Specs</RootNamespace>
+    <AssemblyName>Mixpanel.NET.Specs</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

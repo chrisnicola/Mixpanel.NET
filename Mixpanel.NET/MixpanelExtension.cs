@@ -27,8 +27,7 @@ namespace Mixpanel.NET {
       return new JavaScriptSerializer().Deserialize<MixpanelEvent>(data);
     }
 
-    public static string SplitCamelCase(this string value)
-    {
+    public static string SplitCamelCase(this string value) {
       var regex = new Regex("(?<=[A-Z])(?=[A-Z][a-z])|(?<=[^A-Z])(?=[A-Z])|(?<=[A-Za-z])(?=[^A-Za-z])");
       return regex.Replace(value, " ");
     }
