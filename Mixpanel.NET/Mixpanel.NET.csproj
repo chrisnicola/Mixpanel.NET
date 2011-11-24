@@ -41,7 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MixPanel.cs" />
+    <Compile Include="DataApi.cs" />
+    <Compile Include="MixpanelExtension.cs" />
+    <Compile Include="MixpanelHttp.cs" />
+    <Compile Include="Tracker.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
