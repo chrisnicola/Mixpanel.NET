@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
 
 namespace Mixpanel.NET {
@@ -24,6 +25,12 @@ namespace Mixpanel.NET {
 
     public static MixpanelEvent ParseEvent(this string data) {
       return new JavaScriptSerializer().Deserialize<MixpanelEvent>(data);
+    }
+
+    public static string SplitCamelCase(this string value)
+    {
+      var regex = new Regex("(?<=[A-Z])(?=[A-Z][a-z])|(?<=[^A-Z])(?=[A-Z])|(?<=[A-Za-z])(?=[^A-Za-z])");
+      return regex.Replace(value, " ");
     }
   }
 }

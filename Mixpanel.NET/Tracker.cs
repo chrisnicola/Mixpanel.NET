@@ -7,13 +7,25 @@ using System.Linq;
 namespace Mixpanel.NET {
   public class Tracker {
     readonly IMixpanelHttp _http;
+    readonly bool _literialSerialization;
     readonly string _token;
 
     public Tracker(string token) : this(token, new MixpanelHttp()) { }
 
-    public Tracker(string token, IMixpanelHttp http) {
+    /// <summary>
+    /// Creates a new Mixpanel tracker for a given API token
+    /// </summary>
+    /// <param name="token">The API token for MixPanel</param>
+    /// <param name="http">An implementation of IMixpanelHttp, <see cref="MixpanelHttp"/></param>
+    /// <param name="literialSerialization">
+    /// Determines if class names and properties will be serialized to JSON literally.
+    /// If false (the default) spaces will be inserted between camel-cased words for improved 
+    /// readability on the reporting side.
+    /// </param>
+    public Tracker(string token, IMixpanelHttp http, bool literialSerialization = false) {
       _token = token;
       _http = http;
+      _literialSerialization = literialSerialization;
     }
 
     public bool Track(string @event, Dictionary<string, object> properties, bool test = false) {
@@ -30,10 +42,10 @@ namespace Mixpanel.NET {
    }    
 
     public bool Track<T>(T @event, bool test = false) {
-      var name = @event.GetType().Name;
+      var name = _literialSerialization ? @event.GetType().Name : @event.GetType().Name.SplitCamelCase();
       var properties = @event.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
       var propertyBag = properties.ToDictionary(
-        x => x.Name,
+        x => _literialSerialization ? x.Name : x.Name.SplitCamelCase(),
         x => x.GetValue(@event, null));
       return Track(name, propertyBag, test);
     }

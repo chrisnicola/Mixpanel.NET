@@ -59,7 +59,25 @@ namespace Mixpanel.NET.specs.Unit
   public class when_sending_tracker_data_using_an_object : tracker_context {
     Because of = () => {
       _event = new MyEvent {
-        PropertyOne = 0, PropertyTwo = "string"
+        PropertyOne = 0, PropertyTwoFour = "string"
+      };
+      _result = Tracker.Track(_event);
+    };
+
+    It should_track_successfully = () => _result.ShouldBeTrue();
+    It should_send_the_event_name = () => SentData.ShouldHaveName("My Event");
+    It should_send_property_one = () => SentData.ShouldHaveProperty("Property One", _event.PropertyOne);
+    It should_send_property_two = () => SentData.ShouldHaveProperty("Property Two Four", _event.PropertyTwoFour);
+
+    static MyEvent _event;
+    static bool _result;
+  }
+
+  public class when_sending_tracker_data_using_an_object_with_literal_serializatioin : tracker_context {
+    Because of = () => {
+      Tracker = new Tracker("my token", FakeHttp, true);
+      _event = new MyEvent {
+        PropertyOne = 0, PropertyTwoFour = "string"
       };
       _result = Tracker.Track(_event);
     };
@@ -67,15 +85,20 @@ namespace Mixpanel.NET.specs.Unit
     It should_track_successfully = () => _result.ShouldBeTrue();
     It should_send_the_event_name = () => SentData.ShouldHaveName("MyEvent");
     It should_send_property_one = () => SentData.ShouldHaveProperty("PropertyOne", _event.PropertyOne);
-    It should_send_property_two = () => SentData.ShouldHaveProperty("PropertyTwo", _event.PropertyTwo);
+    It should_send_property_two = () => SentData.ShouldHaveProperty("PropertyTwo", _event.PropertyTwoFour);
 
     static MyEvent _event;
     static bool _result;
   }
 
+  public class when_sending_tracker_data_with_conventions : tracker_context {
+
+    
+  }
+
   class MyEvent {
     public int PropertyOne { get; set; }
-    public string PropertyTwo { get; set; }
+    public string PropertyTwoFour { get; set; }
   }
 
   public static class ShouldExtenstions
