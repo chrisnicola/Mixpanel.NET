@@ -1,0 +1,17 @@
+[Bb]in
+ClientBin
+[Oo]bj
+build
+*.suo
+_ReSharper.*
+*.user
+*.sln.cache
+*.swp
+*.vssscc
+*.vspscc
+*.build.*
+*.orig
+*~
+.idea/
+release/
+*.nupkg
