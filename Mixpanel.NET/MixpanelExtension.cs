@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -30,6 +31,13 @@ namespace Mixpanel.NET {
     public static string SplitCamelCase(this string value) {
       var regex = new Regex("(?<=[A-Z])(?=[A-Z][a-z])|(?<=[^A-Z])(?=[A-Z])|(?<=[A-Za-z])(?=[^A-Za-z])");
       return regex.Replace(value, " ");
+    }
+
+    public static string ComputeHash(this string value) {
+      var bytes = Encoding.UTF8.GetBytes(value);
+      var hash = MD5.Create().ComputeHash(bytes);
+      var hexDigest = hash.Aggregate("", (x,y) => x + y.ToString("X").ToLower());
+      return hexDigest;
     }
   }
 }

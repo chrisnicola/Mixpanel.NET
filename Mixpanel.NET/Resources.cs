@@ -1,6 +1,10 @@
 ﻿namespace Mixpanel.NET {
   public static class Resources {
-    public static string BaseUrl { get { return "http://api.mixpanel.com"; }}
-    public static string Track { get { return BaseUrl + "/track"; }}
+    public static string MixpanelUrl { get { return "http://api.mixpanel.com"; }}
+
+    public static string Track(string proxy = null) {
+      proxy = proxy ?? MixpanelUrl;
+      return proxy + "/track";
+    }
   }
 }           

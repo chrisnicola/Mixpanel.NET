@@ -6,11 +6,11 @@ namespace Mixpanel.NET.Specs.Integration
   // Use this test to verify your mixpanel token is working.
   public class when_sending_valid_dictionary_data_to_mixpanel {
     Establish that = () => {
-      _panel = new Tracker("Your mixpanel token here");
+      _panel = new Tracker("Your mixpanel token here", new TrackerOptions{ Test = true, Bucket = "test" });
       _properties = new Dictionary<string, object> { {"prop1", 0}, {"prop2", "tessdfasdfasdfasdfasdft"} };
     };
 
-    Because of = () => _result = _panel.Track("Test", _properties, true);
+    Because of = () => _result = _panel.Track("Test", _properties);
 
     It should_track_successfully = () => _result.ShouldBeTrue();
 
@@ -28,7 +28,7 @@ namespace Mixpanel.NET.Specs.Integration
       };
     };
 
-    Because of = () => _result = _panel.Track(_event, true);
+    Because of = () => _result = _panel.Track(_event);
 
     It should_track_successfully = () => _result.ShouldBeTrue();
 

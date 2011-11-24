@@ -1,3 +1,6 @@
+using System.Security.Cryptography;
+using System.Text;
+
 namespace Mixpanel.NET
 {
   public class DataApi {
@@ -7,6 +10,10 @@ namespace Mixpanel.NET
     public DataApi(string apiKey, string apiSecret) {
       _apiKey = apiKey;
       _apiSecret = apiSecret;
+    }
+
+    public string CreateBucketSecret(string bucket) {
+      return (_apiSecret + bucket).ComputeHash();
     }
   }
 }

@@ -7,10 +7,10 @@ using System.Linq;
 namespace Mixpanel.NET {
   public class Tracker {
     readonly IMixpanelHttp _http;
-    readonly bool _literialSerialization;
+    readonly TrackerOptions _options;
     readonly string _token;
 
-    public Tracker(string token) : this(token, new MixpanelHttp()) { }
+    public Tracker(string token, TrackerOptions options = null) : this(token, new MixpanelHttp(), options) { }
 
     /// <summary>
     /// Creates a new Mixpanel tracker for a given API token
@@ -22,32 +22,34 @@ namespace Mixpanel.NET {
     /// If false (the default) spaces will be inserted between camel-cased words for improved 
     /// readability on the reporting side.
     /// </param>
-    public Tracker(string token, IMixpanelHttp http, bool literialSerialization = false) {
+    public Tracker(string token, IMixpanelHttp http, TrackerOptions options = null) {
       _token = token;
       _http = http;
-      _literialSerialization = literialSerialization;
+      _options = options ?? new TrackerOptions();
     }
 
-    public bool Track(string @event, Dictionary<string, object> properties, bool test = false) {
+    public bool Track(string @event, Dictionary<string, object> properties) {
       properties["token"] = _token;
       if (!properties.ContainsKey("Time") || !properties.ContainsKey("time")) 
         properties["time"] = DateTime.UtcNow;
+      if ((!properties.ContainsKey("Bucket") || !properties.ContainsKey("bucket")) && _options.Bucket != null)
+        properties["bucket"] = _options.Bucket;
       var data = new JavaScriptSerializer().Serialize(new Dictionary<string, object> {
         {"event", @event}, {"properties", properties}
       });
-      var requestUriString = string.Format("{0}/?data={1}", Resources.Track, data.Base64Encode());
-      if (test) requestUriString += "&test=1";
+      var requestUriString = string.Format("{0}/?data={1}", Resources.Track(_options.ProxyUrl), data.Base64Encode());
+      if (_options.Test) requestUriString += "&test=1";
       var contents = _http.Get(requestUriString);
       return contents == "1";
    }    
 
-    public bool Track<T>(T @event, bool test = false) {
-      var name = _literialSerialization ? @event.GetType().Name : @event.GetType().Name.SplitCamelCase();
+    public bool Track<T>(T @event, string bucket = null, bool test = false) {
+      var name = _options.LiteralSerialization ? @event.GetType().Name : @event.GetType().Name.SplitCamelCase();
       var properties = @event.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
       var propertyBag = properties.ToDictionary(
-        x => _literialSerialization ? x.Name : x.Name.SplitCamelCase(),
+        x => _options.LiteralSerialization ? x.Name : x.Name.SplitCamelCase(),
         x => x.GetValue(@event, null));
-      return Track(name, propertyBag, test);
+      return Track(name, propertyBag);
     }
   }
 
