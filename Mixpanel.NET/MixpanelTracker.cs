@@ -5,12 +5,13 @@ using System.Web.Script.Serialization;
 using System.Linq;
 
 namespace Mixpanel.NET {
-  public class Tracker {
+  public class MixpanelTracker : IEventTracker
+  {
     readonly IMixpanelHttp _http;
     readonly TrackerOptions _options;
     readonly string _token;
 
-    public Tracker(string token, TrackerOptions options = null) : this(token, new MixpanelHttp(), options) { }
+    public MixpanelTracker(string token, TrackerOptions options = null) : this(token, new MixpanelHttp(), options) { }
 
     /// <summary>
     /// Creates a new Mixpanel tracker for a given API token
@@ -22,7 +23,7 @@ namespace Mixpanel.NET {
     /// If false (the default) spaces will be inserted between camel-cased words for improved 
     /// readability on the reporting side.
     /// </param>
-    public Tracker(string token, IMixpanelHttp http, TrackerOptions options = null) {
+    public MixpanelTracker(string token, IMixpanelHttp http, TrackerOptions options = null) {
       _token = token;
       _http = http;
       _options = options ?? new TrackerOptions();

@@ -13,7 +13,7 @@ namespace Mixpanel.NET.Specs.Unit {
         .Returns("1");
       A.CallTo(() => FakeHttp.Get(A<string>.That.Matches(x => !ValidUriCheck(x))))
         .Returns("0");
-      Tracker = new Tracker("Your mixpanel token", FakeHttp);
+      MixpanelTracker = new MixpanelTracker("Your mixpanel token", FakeHttp);
     };
   
     static bool ValidUriCheck(string location) {
@@ -28,7 +28,7 @@ namespace Mixpanel.NET.Specs.Unit {
     }
 
     protected static IMixpanelHttp FakeHttp;   
-    protected static Tracker Tracker;
+    protected static MixpanelTracker MixpanelTracker;
     protected static string SentData;
     protected static Uri SentToUri;
   }
@@ -36,7 +36,7 @@ namespace Mixpanel.NET.Specs.Unit {
   public class when_sending_tracker_data_using_a_dictionary : tracker_context {
     Because of = () => {
       var properties = new Dictionary<string, object> {{"prop1", 0}, {"prop2", "string"}};
-      _result = Tracker.Track("Test", properties);
+      _result = MixpanelTracker.Track("Test", properties);
     };
 
     It should_track_successfully = () => _result.ShouldBeTrue();
@@ -53,7 +53,7 @@ namespace Mixpanel.NET.Specs.Unit {
       _event = new MyEvent {
         PropertyOne = 0, PropertyTwoFour = "string"
       };
-      _result = Tracker.Track(_event);
+      _result = MixpanelTracker.Track(_event);
     };
 
     It should_track_successfully = () => _result.ShouldBeTrue();
@@ -68,11 +68,11 @@ namespace Mixpanel.NET.Specs.Unit {
 
   public class when_sending_tracker_data_using_an_object_with_literal_serializatioin : tracker_context {
     Because of = () => {
-      Tracker = new Tracker("my token", FakeHttp, new TrackerOptions { LiteralSerialization = true });
+      MixpanelTracker = new MixpanelTracker("my token", FakeHttp, new TrackerOptions { LiteralSerialization = true });
       _event = new MyEvent {
         PropertyOne = 0, PropertyTwoFour = "string"
       };
-      _result = Tracker.Track(_event);
+      _result = MixpanelTracker.Track(_event);
     };
 
     It should_track_successfully = () => _result.ShouldBeTrue();
@@ -89,14 +89,14 @@ namespace Mixpanel.NET.Specs.Unit {
   {
     Establish that = () => {
       _proxy = "http://mytestproxy.com/";
-      Tracker = new Tracker("my token", FakeHttp, new TrackerOptions { ProxyUrl = _proxy });
+      MixpanelTracker = new MixpanelTracker("my token", FakeHttp, new TrackerOptions { ProxyUrl = _proxy });
       _event = new MyEvent {
         PropertyOne = 0,
         PropertyTwoFour = "string"
       };
     };
 
-    Because of = () => _result = Tracker.Track(_event);
+    Because of = () => _result = MixpanelTracker.Track(_event);
 
     It should_track_successfully = () => _result.ShouldBeTrue();
     It should_send_the_event_name = () => SentData.ShouldHaveName("My Event");
