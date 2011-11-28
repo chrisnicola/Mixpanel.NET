@@ -19,9 +19,7 @@ namespace Mixpanel.NET {
       return Encoding.UTF8.GetString(bytes);
     }
       
-    public static IDictionary<string,string> UriParameters(this string source) {
-      if (!Uri.IsWellFormedUriString(source, UriKind.RelativeOrAbsolute)) return null;
-      var query = new Uri(source).Query;
+    public static IDictionary<string,string> UriParameters(this string query) {
       return query.TrimStart('?').Split('&').ToDictionary(x => x.Split('=')[0], x => x.Substring(x.Split('=')[0].Length + 1));
     }
 

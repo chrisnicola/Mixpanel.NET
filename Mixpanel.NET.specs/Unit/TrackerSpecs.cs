@@ -9,10 +9,15 @@ namespace Mixpanel.NET.Specs.Unit {
   public class tracker_context {
     Establish that = () => {
       FakeHttp = A.Fake<IMixpanelHttp>();
-      A.CallTo(() => FakeHttp.Get(A<string>.That.Matches(x => ValidUriCheck(x))))
-        .Invokes(x => CatchSentParameterData(x.GetArgument<string>(0)))
+      A.CallTo(() => FakeHttp.Post(A<string>.That.Matches(x => ValidUriCheck(x)), A<string>.Ignored))
+        .Invokes(x => CatchSentParameterData(x.GetArgument<string>(0), x.GetArgument<string>(1)))
         .Returns("1");
-      A.CallTo(() => FakeHttp.Get(A<string>.That.Matches(x => !ValidUriCheck(x))))
+      A.CallTo(() => FakeHttp.Post(A<string>.That.Matches(x => !ValidUriCheck(x)), A<string>.Ignored))
+        .Returns("0");
+      A.CallTo(() => FakeHttp.Get(A<string>.That.Matches(x => ValidUriCheck(x)), A<string>.Ignored))
+        .Invokes(x => CatchSentParameterData(x.GetArgument<string>(0), x.GetArgument<string>(1)))
+        .Returns("1");
+      A.CallTo(() => FakeHttp.Get(A<string>.That.Matches(x => !ValidUriCheck(x)), A<string>.Ignored))
         .Returns("0");
       MixpanelTracker = new MixpanelTracker("Your mixpanel token", FakeHttp);
     };
@@ -23,8 +28,8 @@ namespace Mixpanel.NET.Specs.Unit {
       return true;
     }
     
-    static void CatchSentParameterData(string data) {
-      SentToUri = new Uri(data);
+    static void CatchSentParameterData(string uri, string data) {
+      SentToUri = new Uri(uri);
       SentData = data.UriParameters()["data"].Base64Decode();
     }
 
@@ -131,6 +136,29 @@ namespace Mixpanel.NET.Specs.Unit {
     static bool _result;
     static string _proxy;
   }
+
+  public class when_sending_data_using_get : tracker_context
+  {
+    Establish that = () => {
+      MixpanelTracker = new MixpanelTracker("my token", FakeHttp, new TrackerOptions { UseGet = true });
+      _event = new MyEvent {
+        PropertyOne = 0,
+        PropertyTwoFour = "string"
+      };
+    };
+
+    Because of = () => _result = MixpanelTracker.Track(_event);
+
+    It should_track_successfully = () => _result.ShouldBeTrue();
+    It should_send_the_event_name = () => SentData.ShouldHaveName("My Event");
+    It should_send_property_one = () => SentData.ShouldHaveProperty("Property One", _event.PropertyOne);
+    It should_send_property_two = () => SentData.ShouldHaveProperty("Property Two Four", _event.PropertyTwoFour);
+    It should_send_via_the_get_method = () => A.CallTo(() => FakeHttp.Get(A<string>.Ignored, A<string>.Ignored))
+      .MustHaveHappened();
+
+    static MyEvent _event;
+    static bool _result;
+  }         
 
   class MyEvent {
     public int PropertyOne { get; set; }

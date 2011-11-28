@@ -37,6 +37,23 @@ namespace Mixpanel.NET.Specs.Integration
     static bool _result;
   }
 
+  public class when_using_get_instead_of_post {
+    Establish that = () => {
+      _panel = new MixpanelTracker("Your mixpanel token here", new TrackerOptions{ UseGet = true });
+      _event = new MyCrazyTestEvent {
+        Data1 = "Some data here",
+        Data2 = "Some more data"
+      };
+    };
+
+    Because of = () => _result = _panel.Track(_event);
+
+    It should_track_successfully = () => _result.ShouldBeTrue();
+
+    static MyCrazyTestEvent _event;
+    static MixpanelTracker _panel;
+    static bool _result;
+  }
   public class MyCrazyTestEvent : TrackingEventBase {
     public string Data1 { get; set; }
 

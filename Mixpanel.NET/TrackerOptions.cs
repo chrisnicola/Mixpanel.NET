@@ -31,5 +31,13 @@ namespace Mixpanel.NET
     /// default: null
     /// </summary>
     public string ProxyUrl { get; set; }
+
+    /// <summary>
+    /// Mixpanel supports both GET and POST for submitting tracking data. We recommend POST since it
+    /// the proper way of submitting data via HTTP, however GET support is availabe if desired by
+    /// setting this flag to true. 
+    /// default: false 
+    /// </summary>
+    public bool UseGet { get; set; }
   }
 }

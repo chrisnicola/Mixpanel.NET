@@ -37,9 +37,11 @@ namespace Mixpanel.NET {
       var data = new JavaScriptSerializer().Serialize(new Dictionary<string, object> {
         {"event", @event}, {"properties", properties}
       });
-      var requestUriString = string.Format("{0}/?data={1}", Resources.Track(_options.ProxyUrl), data.Base64Encode());
-      if (_options.Test) requestUriString += "&test=1";
-      var contents = _http.Get(requestUriString);
+      var values = "data=" + data.Base64Encode();
+      if (_options.Test) values += "&test=1";
+      var contents = _options.UseGet 
+        ? _http.Get(Resources.Track(_options.ProxyUrl), values)
+        : _http.Post(Resources.Track(_options.ProxyUrl), values);
       return contents == "1";
     }    
 
