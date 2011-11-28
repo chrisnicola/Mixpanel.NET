@@ -2,9 +2,9 @@ using System;
 
 namespace Mixpanel.NET
 {
-  public abstract class TrackingEvent
+  public abstract class TrackingEventBase
   {
-    public TrackingEvent() {
+    public TrackingEventBase() {
       Time = DateTime.UtcNow;
     }
     public DateTime? Time { get; set; }

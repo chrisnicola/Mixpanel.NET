@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Web.Script.Serialization;
 using FakeItEasy;
 using Machine.Specifications;
+using System.Linq;
 
 namespace Mixpanel.NET.Specs.Unit {
   public class tracker_context {
@@ -34,27 +35,50 @@ namespace Mixpanel.NET.Specs.Unit {
   }
 
   public class when_sending_tracker_data_using_a_dictionary : tracker_context {
-    Because of = () => {
-      var properties = new Dictionary<string, object> {{"prop1", 0}, {"prop2", "string"}};
-      _result = MixpanelTracker.Track("Test", properties);
+    Establish that = () => {
+      _properties = new Dictionary<string, object> {{"prop1", 0}, {"prop2", "string"}};
+      _name = "My Event";
     };
 
+    Because of = () => _result = MixpanelTracker.Track(_name, _properties);
+
     It should_track_successfully = () => _result.ShouldBeTrue();
-    It should_send_the_event_name = () => SentData.ShouldHaveName("Test");
-    It should_send_the_dictionary_property_1 = () => SentData.ShouldHaveProperty("prop1", 0);
-    It should_send_the_dictionary_property_2 = () => SentData.ShouldHaveProperty("prop2", "string");
+    It should_send_the_event_name = () => SentData.ShouldHaveName(_name);
+    It should_send_the_dictionary_property_1 = () => 
+      SentData.ShouldHaveProperty(_properties.ElementAt(0).Key, _properties.ElementAt(0).Value);
+    It should_send_the_dictionary_property_2 = () => 
+      SentData.ShouldHaveProperty(_properties.ElementAt(1).Key, _properties.ElementAt(1).Value);
     It should_send_to_the_mixpanel_tracking_url = () => SentToUri.ToString().ShouldStartWith(Resources.Track());
 
     static bool _result;
+    static Dictionary<string, object> _properties;
+    static string _name;
+  }
+
+  public class when_sending_tracker_data_using_a_mixpanel_event : tracker_context {
+    Establish that = () => {
+      var properties = new Dictionary<string, object> {{"prop1", 0}, {"prop2", "string"}};
+      _event = new MixpanelEvent("My Event", properties);
+    };
+
+    Because of = () => _result = MixpanelTracker.Track(_event);
+
+    It should_track_successfully = () => _result.ShouldBeTrue();
+    It should_send_the_event_name = () => SentData.ShouldHaveName(_event.Event);
+    It should_send_the_dictionary_property_1 = () => 
+      SentData.ShouldHaveProperty(_event.Properties.ElementAt(0).Key, _event.Properties.ElementAt(0).Value);
+    It should_send_the_dictionary_property_2 = () => 
+      SentData.ShouldHaveProperty(_event.Properties.ElementAt(1).Key, _event.Properties.ElementAt(1).Value);
+    It should_send_to_the_mixpanel_tracking_url = () => SentToUri.ToString().ShouldStartWith(Resources.Track());
+
+    static bool _result;
+    static MixpanelEvent _event;
   }
 
   public class when_sending_tracker_data_using_an_object_with_default_naming_conventions : tracker_context {
-    Because of = () => {
-      _event = new MyEvent {
-        PropertyOne = 0, PropertyTwoFour = "string"
-      };
-      _result = MixpanelTracker.Track(_event);
-    };
+    Establish that = () => _event = new MyEvent { PropertyOne = 0, PropertyTwoFour = "string" };
+
+    Because of = () => _result = MixpanelTracker.Track(_event);
 
     It should_track_successfully = () => _result.ShouldBeTrue();
     It should_send_the_event_name = () => SentData.ShouldHaveName("My Event");
@@ -67,13 +91,12 @@ namespace Mixpanel.NET.Specs.Unit {
   }
 
   public class when_sending_tracker_data_using_an_object_with_literal_serializatioin : tracker_context {
-    Because of = () => {
+    Establish that = () => {
       MixpanelTracker = new MixpanelTracker("my token", FakeHttp, new TrackerOptions { LiteralSerialization = true });
-      _event = new MyEvent {
-        PropertyOne = 0, PropertyTwoFour = "string"
-      };
-      _result = MixpanelTracker.Track(_event);
+      _event = new MyEvent { PropertyOne = 0, PropertyTwoFour = "string" };
     };
+
+    Because of = () => _result = MixpanelTracker.Track(_event);
 
     It should_track_successfully = () => _result.ShouldBeTrue();
     It should_send_the_event_name = () => SentData.ShouldHaveName("MyEvent");

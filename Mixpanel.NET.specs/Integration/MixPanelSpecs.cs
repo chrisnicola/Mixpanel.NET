@@ -37,7 +37,7 @@ namespace Mixpanel.NET.Specs.Integration
     static bool _result;
   }
 
-  public class MyCrazyTestEvent : TrackingEvent {
+  public class MyCrazyTestEvent : TrackingEventBase {
     public string Data1 { get; set; }
 
     public string Data2 { get; set; }

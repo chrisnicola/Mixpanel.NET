@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Linq;
@@ -22,6 +23,15 @@ namespace Mixpanel.NET {
       if (!Uri.IsWellFormedUriString(source, UriKind.RelativeOrAbsolute)) return null;
       var query = new Uri(source).Query;
       return query.TrimStart('?').Split('&').ToDictionary(x => x.Split('=')[0], x => x.Substring(x.Split('=')[0].Length + 1));
+    }
+
+    public static MixpanelEvent ToMixpanelEvent(this object @event, bool literalSerialization = false) {
+      var name = literalSerialization ? @event.GetType().Name : @event.GetType().Name.SplitCamelCase();
+      var properties = @event.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+      var propertyBag = properties.ToDictionary(
+        x => literalSerialization ? x.Name : x.Name.SplitCamelCase(),
+        x => x.GetValue(@event, null));
+      return new MixpanelEvent(name, propertyBag);
     }
 
     public static MixpanelEvent ParseEvent(this string data) {
