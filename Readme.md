@@ -12,7 +12,6 @@ If you have feature suggestions please open a github issue for them.
 
 ### Planned Features:
 
-* Queue (durable?) for events and asyncronous tracking
 * Seperate API wrappers for the Mixpanel data query API
 
 ### Usage:
