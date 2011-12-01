@@ -11,9 +11,5 @@ namespace Mixpanel.NET
       _apiKey = apiKey;
       _apiSecret = apiSecret;
     }
-
-    public string CreateBucketSecret(string bucket) {
-      return (_apiSecret + bucket).ComputeHash();
-    }
   }
 }

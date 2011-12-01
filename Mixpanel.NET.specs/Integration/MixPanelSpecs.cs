@@ -6,7 +6,7 @@ namespace Mixpanel.NET.Specs.Integration
   // Use this test to verify your mixpanel token is working.
   public class when_sending_valid_dictionary_data_to_mixpanel {
     Establish that = () => {
-      _panel = new MixpanelTracker("Your mixpanel token here", new TrackerOptions{ Test = true, Bucket = "test" });
+      _panel = new MixpanelTracker("Your mixpanel token here", new TrackerOptions{ Test = true });
       _properties = new Dictionary<string, object> { {"prop1", 0}, {"prop2", "tessdfasdfasdfasdfasdft"} };
     };
 

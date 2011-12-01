@@ -37,6 +37,9 @@
     <Reference Include="FakeItEasy">
       <HintPath>..\Mixpanel.NET\packages\FakeItEasy.1.7.4166.27\lib\NET40\FakeItEasy.dll</HintPath>
     </Reference>
+    <Reference Include="FluentAssertions">
+      <HintPath>..\Mixpanel.NET\packages\FluentAssertions.1.6.0\Lib\net40\FluentAssertions.dll</HintPath>
+    </Reference>
     <Reference Include="Machine.Fakes">
       <HintPath>..\Mixpanel.NET\packages\Machine.Fakes.0.2.6\lib\Machine.Fakes.dll</HintPath>
     </Reference>

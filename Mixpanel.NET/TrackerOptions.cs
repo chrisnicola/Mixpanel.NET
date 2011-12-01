@@ -5,12 +5,12 @@ namespace Mixpanel.NET
   /// </summary>
   public class TrackerOptions {
     /// <summary>
-    /// Specify a bucket that this tracker's data should be placed into. Even if set this value can be 
-    /// overridden by including a 'Bucket' property value in the event data itself.
-    /// see: http://mixpanel.com/api/docs/guides/platform 
-    /// default: null
+    /// If true the tracker will automatically set the event timestamp for each event, unless the 
+    /// property "time" or "Time" has already been set to something else.  Otherwise no time will
+    /// be set if it doesn't exist.
+    /// default: true
     /// </summary>
-    public string Bucket { get; set; }
+    public bool SetEventTime = true;
 
     /// <summary>
     /// If true then the test flag is used when sending data to Mixpanel.

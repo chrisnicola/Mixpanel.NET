@@ -29,13 +29,17 @@ namespace Mixpanel.NET {
     }
 
     public bool Track(string @event, IDictionary<string, object> properties) {
-      properties["token"] = _token;
-      if (!properties.ContainsKey("Time") || !properties.ContainsKey("time"))
-        properties["time"] = DateTime.UtcNow;
-      if ((!properties.ContainsKey("Bucket") || !properties.ContainsKey("bucket")) && _options.Bucket != null)
-        properties["bucket"] = _options.Bucket;
+      var propertyBag = new Dictionary<string,object>(properties);
+      // Standardize token and time values for Mixpanel
+      propertyBag["token"] = _token;
+      if (_options.SetEventTime)
+      { 
+        propertyBag["time"] = propertyBag.Where(x => x.Key.ToLower() == "time").Select(x => x.Value).FirstOrDefault() 
+          ?? DateTime.UtcNow;
+        propertyBag.Remove("Time");
+      }
       var data = new JavaScriptSerializer().Serialize(new Dictionary<string, object> {
-        {"event", @event}, {"properties", properties}
+        {"event", @event}, {"properties", propertyBag}
       });
       var values = "data=" + data.Base64Encode();
       if (_options.Test) values += "&test=1";

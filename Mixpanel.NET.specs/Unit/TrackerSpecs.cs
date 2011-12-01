@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web.Script.Serialization;
 using FakeItEasy;
 using Machine.Specifications;
 using System.Linq;
+using FluentAssertions;
 
 namespace Mixpanel.NET.Specs.Unit {
   public class tracker_context {
@@ -19,7 +19,9 @@ namespace Mixpanel.NET.Specs.Unit {
         .Returns("1");
       A.CallTo(() => FakeHttp.Get(A<string>.That.Matches(x => !ValidUriCheck(x)), A<string>.Ignored))
         .Returns("0");
-      MixpanelTracker = new MixpanelTracker("Your mixpanel token", FakeHttp);
+      Token = "Your mixpanel token";
+      Proxy = null;
+      MixpanelTracker = new MixpanelTracker(Token, FakeHttp);
     };
   
     static bool ValidUriCheck(string location) {
@@ -30,159 +32,139 @@ namespace Mixpanel.NET.Specs.Unit {
     
     static void CatchSentParameterData(string uri, string data) {
       SentToUri = new Uri(uri);
-      SentData = data.UriParameters()["data"].Base64Decode();
+      SentData = data.UriParameters()["data"].Base64Decode().ParseEvent();
     }
 
     protected static IMixpanelHttp FakeHttp;   
     protected static MixpanelTracker MixpanelTracker;
-    protected static string SentData;
+
+    protected static MixpanelEvent SentData;
+    protected static MixpanelEvent Event;
+    protected static bool Result;
     protected static Uri SentToUri;
+    protected static string Token;
+    protected static string Proxy;
+  }
+
+  [Behaviors]
+  public class a_mixpanel_event_sent
+  {
+    protected static MixpanelEvent SentData;
+    protected static MixpanelEvent Event;
+    protected static bool Result;
+    protected static Uri SentToUri;
+    protected static string Token;
+    protected static string Proxy;
+
+    It should_track_successfully = () => Result.ShouldBeTrue();
+    It should_send_the_event_name = () => SentData.Event.Should().Be(Event.Event);
+    It should_send_the_dictionary_properties = () => 
+      SentData.Properties.Where(x => x.Key.ToLower() != "time" && x.Key.ToLower() != "token").Should()
+      .Equal(Event.Properties.Where(x => x.Key.ToLower() != "time" && x.Key.ToLower() != "token"));
+    It should_send_the_token = () => SentData.Properties["token"].Should().Be(Token);
+    It should_send_to_the_mixpanel_tracking_url = () => SentToUri.ToString().ShouldStartWith(Resources.Track(Proxy));
   }
 
   public class when_sending_tracker_data_using_a_dictionary : tracker_context {
     Establish that = () => {
-      _properties = new Dictionary<string, object> {{"prop1", 0}, {"prop2", "string"}};
-      _name = "My Event";
+      Event = new MixpanelEvent("My Event", new Dictionary<string, object> {{"prop1", 0}, {"prop2", "string"}});
     };
 
-    Because of = () => _result = MixpanelTracker.Track(_name, _properties);
+    Because of = () => Result = MixpanelTracker.Track(Event.Event, Event.Properties);
 
-    It should_track_successfully = () => _result.ShouldBeTrue();
-    It should_send_the_event_name = () => SentData.ShouldHaveName(_name);
-    It should_send_the_dictionary_property_1 = () => 
-      SentData.ShouldHaveProperty(_properties.ElementAt(0).Key, _properties.ElementAt(0).Value);
-    It should_send_the_dictionary_property_2 = () => 
-      SentData.ShouldHaveProperty(_properties.ElementAt(1).Key, _properties.ElementAt(1).Value);
-    It should_send_to_the_mixpanel_tracking_url = () => SentToUri.ToString().ShouldStartWith(Resources.Track());
-
-    static bool _result;
-    static Dictionary<string, object> _properties;
-    static string _name;
+    Behaves_like<a_mixpanel_event_sent> a_mixpanel_event_was_sent;
+    It should_have_set_the_time_automatically = () => SentData.Properties["time"].As<DateTime>()
+      .ShouldBeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
   }
 
   public class when_sending_tracker_data_using_a_mixpanel_event : tracker_context {
     Establish that = () => {
-      var properties = new Dictionary<string, object> {{"prop1", 0}, {"prop2", "string"}};
-      _event = new MixpanelEvent("My Event", properties);
+      Event = new MixpanelEvent("My Event", new Dictionary<string, object> {{"prop1", 0}, {"prop2", "string"}});
     };
 
-    Because of = () => _result = MixpanelTracker.Track(_event);
+    Because of = () => Result = MixpanelTracker.Track(Event);
 
-    It should_track_successfully = () => _result.ShouldBeTrue();
-    It should_send_the_event_name = () => SentData.ShouldHaveName(_event.Event);
-    It should_send_the_dictionary_property_1 = () => 
-      SentData.ShouldHaveProperty(_event.Properties.ElementAt(0).Key, _event.Properties.ElementAt(0).Value);
-    It should_send_the_dictionary_property_2 = () => 
-      SentData.ShouldHaveProperty(_event.Properties.ElementAt(1).Key, _event.Properties.ElementAt(1).Value);
-    It should_send_to_the_mixpanel_tracking_url = () => SentToUri.ToString().ShouldStartWith(Resources.Track());
-
-    static bool _result;
-    static MixpanelEvent _event;
+    Behaves_like<a_mixpanel_event_sent> a_mixpanel_event_was_sent;
   }
 
   public class when_sending_tracker_data_using_an_object_with_default_naming_conventions : tracker_context {
-    Establish that = () => _event = new MyEvent { PropertyOne = 0, PropertyTwoFour = "string" };
+    Establish that = () => {
+      _event = new MyEvent { PropertyOne = 0, PropertyTwoFour = "string" };
+      Event = _event.ToMixpanelEvent();
+    };
 
-    Because of = () => _result = MixpanelTracker.Track(_event);
+    Because of = () => Result = MixpanelTracker.Track(_event);
 
-    It should_track_successfully = () => _result.ShouldBeTrue();
-    It should_send_the_event_name = () => SentData.ShouldHaveName("My Event");
-    It should_send_property_one = () => SentData.ShouldHaveProperty("Property One", _event.PropertyOne);
-    It should_send_property_two = () => SentData.ShouldHaveProperty("Property Two Four", _event.PropertyTwoFour);
-    It should_send_to_the_mixpanel_tracking_url = () => SentToUri.ToString().ShouldStartWith(Resources.Track());
+    Behaves_like<a_mixpanel_event_sent> a_mixpanel_event_was_sent;
 
     static MyEvent _event;
-    static bool _result;
   }
 
   public class when_sending_tracker_data_using_an_object_with_literal_serializatioin : tracker_context {
     Establish that = () => {
-      MixpanelTracker = new MixpanelTracker("my token", FakeHttp, new TrackerOptions { LiteralSerialization = true });
+      MixpanelTracker = new MixpanelTracker(Token, FakeHttp, new TrackerOptions { LiteralSerialization = true });
       _event = new MyEvent { PropertyOne = 0, PropertyTwoFour = "string" };
+      Event = _event.ToMixpanelEvent(true);
     };
 
-    Because of = () => _result = MixpanelTracker.Track(_event);
+    Because of = () => Result = MixpanelTracker.Track(_event);
 
-    It should_track_successfully = () => _result.ShouldBeTrue();
-    It should_send_the_event_name = () => SentData.ShouldHaveName("MyEvent");
-    It should_send_property_one = () => SentData.ShouldHaveProperty("PropertyOne", _event.PropertyOne);
-    It should_send_property_two = () => SentData.ShouldHaveProperty("PropertyTwoFour", _event.PropertyTwoFour);
-    It should_send_to_the_mixpanel_tracking_url = () => SentToUri.ToString().ShouldStartWith(Resources.Track());
+    Behaves_like<a_mixpanel_event_sent> a_mixpanel_event_was_sent;
 
     static MyEvent _event;
-    static bool _result;
   }
 
   public class when_sending_tracker_data_using_a_proxy_url : tracker_context
   {
     Establish that = () => {
-      _proxy = "http://mytestproxy.com/";
-      MixpanelTracker = new MixpanelTracker("my token", FakeHttp, new TrackerOptions { ProxyUrl = _proxy });
-      _event = new MyEvent {
-        PropertyOne = 0,
-        PropertyTwoFour = "string"
-      };
+      Proxy = "http://mytestproxy.com/";
+      MixpanelTracker = new MixpanelTracker(Token, FakeHttp, new TrackerOptions { ProxyUrl = Proxy });
+      _event = new MyEvent { PropertyOne = 0, PropertyTwoFour = "string" };
+      Event = _event.ToMixpanelEvent();
     };
 
-    Because of = () => _result = MixpanelTracker.Track(_event);
+    Because of = () => Result = MixpanelTracker.Track(_event);
 
-    It should_track_successfully = () => _result.ShouldBeTrue();
-    It should_send_the_event_name = () => SentData.ShouldHaveName("My Event");
-    It should_send_property_one = () => SentData.ShouldHaveProperty("Property One", _event.PropertyOne);
-    It should_send_property_two = () => SentData.ShouldHaveProperty("Property Two Four", _event.PropertyTwoFour);
-    It should_send_to_the_proxy_url = () => SentToUri.ToString().ShouldStartWith(Resources.Track(_proxy));
+    Behaves_like<a_mixpanel_event_sent> a_mixpanel_event_was_sent;
 
     static MyEvent _event;
-    static bool _result;
-    static string _proxy;
   }
 
   public class when_sending_data_using_get : tracker_context
   {
     Establish that = () => {
-      MixpanelTracker = new MixpanelTracker("my token", FakeHttp, new TrackerOptions { UseGet = true });
-      _event = new MyEvent {
-        PropertyOne = 0,
-        PropertyTwoFour = "string"
-      };
+      MixpanelTracker = new MixpanelTracker(Token, FakeHttp, new TrackerOptions { UseGet = true });
+      _event = new MyEvent { PropertyOne = 0, PropertyTwoFour = "string" };
+      Event = _event.ToMixpanelEvent();
     };
 
-    Because of = () => _result = MixpanelTracker.Track(_event);
+    Because of = () => Result = MixpanelTracker.Track(_event);
 
-    It should_track_successfully = () => _result.ShouldBeTrue();
-    It should_send_the_event_name = () => SentData.ShouldHaveName("My Event");
-    It should_send_property_one = () => SentData.ShouldHaveProperty("Property One", _event.PropertyOne);
-    It should_send_property_two = () => SentData.ShouldHaveProperty("Property Two Four", _event.PropertyTwoFour);
+    Behaves_like<a_mixpanel_event_sent> a_mixpanel_event_was_sent;
     It should_send_via_the_get_method = () => A.CallTo(() => FakeHttp.Get(A<string>.Ignored, A<string>.Ignored))
       .MustHaveHappened();
 
     static MyEvent _event;
-    static bool _result;
   }         
+
+  public class when_sending_tracker_data_with_no_timestamp : tracker_context
+  {
+    Establish that = () => {
+      MixpanelTracker = new MixpanelTracker(Token, FakeHttp, new TrackerOptions { SetEventTime  = false });
+      _event = new MyEvent { PropertyOne = 0, PropertyTwoFour = "string" };
+      Event = _event.ToMixpanelEvent();
+    };
+
+    Because of = () => Result = MixpanelTracker.Track(_event);
+
+    Behaves_like<a_mixpanel_event_sent> a_mixpanel_event_was_sent;
+    It should_have_no_time_value = () => SentData.Properties.Where(x => x.Key.ToLower() == "time").ShouldBeEmpty();
+
+    static MyEvent _event;
+  }
 
   class MyEvent {
     public int PropertyOne { get; set; }
     public string PropertyTwoFour { get; set; }
-  }
-
-  public static class ShouldExtenstions
-  {
-    public static T ShouldBeJsonOf<T>(this string source)
-    {
-      return new JavaScriptSerializer().Deserialize<T>(source);
-    }
-    
-    public static void ShouldHaveName(this string source, string name)
-    {
-      var data = source.ParseEvent();
-      if (!name.Equals(data.Event))
-        throw new SpecificationException("Event name did not match");
-    }
-    public static void ShouldHaveProperty(this string source, string name, object value)
-    {
-      var data = source.ParseEvent();
-      if (!value.Equals(data.Properties[name]))
-        throw new SpecificationException("Property value did not match");
-    }
   }
 }
