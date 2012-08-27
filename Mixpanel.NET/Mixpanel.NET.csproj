@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="DataApi.cs" />
     <Compile Include="ITracker.cs" />
+    <Compile Include="MixpanelAsyncHttp.cs" />
     <Compile Include="MixpanelEvent.cs" />
     <Compile Include="MixpanelExtension.cs" />
     <Compile Include="MixpanelHttp.cs" />
