@@ -42,15 +42,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataApi.cs" />
-    <Compile Include="ITracker.cs" />
-    <Compile Include="MixpanelEvent.cs" />
+    <Compile Include="Events\ITracker.cs" />
+    <Compile Include="MixpanelClientBase.cs" />
+    <Compile Include="Events\MixpanelEvent.cs" />
     <Compile Include="MixpanelExtension.cs" />
     <Compile Include="MixpanelHttp.cs" />
-    <Compile Include="MixpanelTracker.cs" />
+    <Compile Include="Events\MixpanelTracker.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TrackerOptions.cs" />
-    <Compile Include="TrackingEventBase.cs" />
+    <Compile Include="Events\TrackerOptions.cs" />
+    <Compile Include="Events\TrackingEventBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
