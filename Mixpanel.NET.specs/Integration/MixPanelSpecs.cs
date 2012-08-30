@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using Machine.Specifications;
+using Mixpanel.NET.Events;
 
 namespace Mixpanel.NET.Specs.Integration
 {
   // Use this test to verify your mixpanel token is working.
   public class when_sending_valid_dictionary_data_to_mixpanel {
     Establish that = () => {
-      _panel = new MixpanelTracker("Your mixpanel token here", new TrackerOptions{ Test = true });
+      _panel = new MixpanelTracker("Your mixpanel token here", options: new TrackerOptions{ Test = true });
       _properties = new Dictionary<string, object> { {"prop1", 0}, {"prop2", "tessdfasdfasdfasdfasdft"} };
     };
 
@@ -39,7 +40,7 @@ namespace Mixpanel.NET.Specs.Integration
 
   public class when_using_get_instead_of_post {
     Establish that = () => {
-      _panel = new MixpanelTracker("Your mixpanel token here", new TrackerOptions{ UseGet = true });
+      _panel = new MixpanelTracker("Your mixpanel token here", options: new TrackerOptions{ UseGet = true });
       _event = new MyCrazyTestEvent {
         Data1 = "Some data here",
         Data2 = "Some more data"

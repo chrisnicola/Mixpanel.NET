@@ -4,6 +4,7 @@ using FakeItEasy;
 using Machine.Specifications;
 using System.Linq;
 using FluentAssertions;
+using Mixpanel.NET.Events;
 
 namespace Mixpanel.NET.Specs.Unit {
   public class tracker_context {
