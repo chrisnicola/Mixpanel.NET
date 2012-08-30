@@ -6,6 +6,7 @@ using System.Text;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
+using Mixpanel.NET.Events;
 
 namespace Mixpanel.NET {
   public static class MixpanelExtension {
