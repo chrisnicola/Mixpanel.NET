@@ -6,10 +6,10 @@
       proxy = proxy ?? MixpanelUrl;
       return proxy + "/track";
     }
-      
+
     public static string Engage(string proxy = null) {
       proxy = proxy ?? MixpanelUrl;
       return proxy + "/engage";
     }
   }
-}           
+}

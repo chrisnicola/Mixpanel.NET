@@ -1,8 +1,5 @@
 using Mixpanel.NET.Events;
 
-namespace Mixpanel.NET.Engage
-{
-    public class EngageOptions : MixpanelClientOptions
-    {
-    }
+namespace Mixpanel.NET.Engage {
+  public class EngageOptions : MixpanelClientOptions {}
 }

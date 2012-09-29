@@ -18,6 +18,7 @@ namespace Mixpanel.NET.Events
         /// If false (the default) spaces will be inserted between camel-cased words for improved 
         /// readability on the reporting side.
         /// </param>
+        /// <param name="options">Optional: Specific options for the API <see cref="TrackerOptions"/></param>
         public MixpanelTracker(string token, IMixpanelHttp http = null, TrackerOptions options = null)
             : base(token, http)
         {

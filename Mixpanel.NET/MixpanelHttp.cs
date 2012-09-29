@@ -9,8 +9,8 @@ namespace Mixpanel.NET
   /// no way to do that with the WebRequest class cleanly.
   /// </summary>
   public interface IMixpanelHttp {
-    string Get(string uri, string query);      
-    string Post(string uri, string body);      
+    string Get(string uri, string query);
+    string Post(string uri, string body);
   }
 
   public class MixpanelHttp : IMixpanelHttp {
@@ -22,7 +22,6 @@ namespace Mixpanel.NET
         ? null
         : new StreamReader(responseStream).ReadToEnd();
     }
-
 
     public string Post(string uri, string body) {
       var request = WebRequest.Create(uri);
