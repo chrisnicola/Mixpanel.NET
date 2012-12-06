@@ -27,26 +27,18 @@ namespace Mixpanel.NET.Events
 
         public bool Track(string @event, IDictionary<string, object> properties)
         {
-            var propertyBag = new Dictionary<string, object>(properties);
+            var propertyBag = properties.FormatProperties();
             // Standardize token and time values for Mixpanel
             propertyBag["token"] = token;
-            if (_options.SetEventTime)
+
+            if (_options.SetEventTime && !properties.Keys.Any(x => x.ToLower() == "time"))
+                propertyBag["time"] = DateTime.UtcNow.FormatDate();
+
+            var data = new JavaScriptSerializer().Serialize(new Dictionary<string, object>
             {
-                propertyBag["time"] =
-                    propertyBag.Where(x => x.Key.ToLower() == "time")
-                    .Select(x => x.Value)
-                    .FirstOrDefault() ?? DateTime.UtcNow;
-
-                propertyBag.Remove("Time");
-            }
-
-            var data =
-                new JavaScriptSerializer()
-                .Serialize(new Dictionary<string, object>
-                {
-                    { "event", @event },
-                    { "properties", propertyBag }
-                });
+                { "event", @event },
+                { "properties", propertyBag }
+            });
 
             var values = "data=" + data.Base64Encode();
 
