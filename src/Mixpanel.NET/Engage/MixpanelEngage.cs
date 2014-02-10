@@ -5,7 +5,9 @@ using Mixpanel.NET.Events;
 
 namespace Mixpanel.NET.Engage {
   public class MixpanelEngage : MixpanelClientBase, IEngage {
-    private readonly EngageOptions _options;
+    private const string EngagePropertyKeyIp = "$ip";
+
+      private readonly EngageOptions _options;
 
     /// <summary>
     /// Creates a new Mixpanel Engage client for a given API token
@@ -21,18 +23,24 @@ namespace Mixpanel.NET.Engage {
       : base(token, http) {
       _options = options ?? new EngageOptions();
     }
+    public bool Set(string distinctId, IDictionary<string, object> setProperties)
+    {
+        return Engage(distinctId, setProperties);
+    }
+
+    public bool Increment(string distinctId, IDictionary<string, object> incrementProperties)
+    {
+        return Engage(distinctId, incrementProperties: incrementProperties);
+    }
 
     private bool Engage(string distinctId, IDictionary<string, object> setProperties = null, 
       IDictionary<string, object> incrementProperties = null) {
-      // Standardize token and time values for Mixpanel
-      var dictionary = 
-        new Dictionary<string, object> {{"$token", token}, {"$distinct_id", distinctId}};
+      var dictionary = CreateEngageDictionary(distinctId);
 
-      if (setProperties != null) dictionary.Add("$set", setProperties);
+        dictionary = AppendSetProperties(setProperties, dictionary);
+        dictionary = AppendIncrementProperties(incrementProperties, dictionary);
 
-      if (incrementProperties != null) dictionary.Add("$add", incrementProperties);
-
-      var data = new JavaScriptSerializer().Serialize(dictionary);
+        var data = new JavaScriptSerializer().Serialize(dictionary);
 
       var values = "data=" + data.Base64Encode();
 
@@ -43,12 +51,39 @@ namespace Mixpanel.NET.Engage {
       return contents == "1";
     }
 
-    public bool Set(string distinctId, IDictionary<string, object> setProperties) {
-      return Engage(distinctId, setProperties);
-    }
+      private IDictionary<string, object> CreateEngageDictionary(string distinctId)
+      {
+          return new Dictionary<string, object> {{"$token", token}, {"$distinct_id", distinctId}};
+      }
 
-    public bool Increment(string distinctId, IDictionary<string, object> incrementProperties) {
-      return Engage(distinctId, incrementProperties: incrementProperties);
-    }
+      private IDictionary<string, object> AppendIncrementProperties(IDictionary<string, object> incrementProperties, IDictionary<string, object> dictionary)
+      {
+          return AppendProperties("$add", incrementProperties, dictionary);
+      }
+
+      private IDictionary<string, object> AppendSetProperties(IDictionary<string, object> setProperties, IDictionary<string, object> dictionary)
+      {
+          return AppendProperties("$set", setProperties, dictionary);
+      }
+
+      private IDictionary<string, object> AppendProperties(string propertiesKey, IDictionary<string, object> properties, IDictionary<string, object> dictionary)
+      {
+          if (properties == null) return dictionary;
+          dictionary.Add(propertiesKey, properties);
+          dictionary = StandardizeIpProperty(dictionary, properties);
+          return dictionary;
+      }
+
+      private IDictionary<string, object> StandardizeIpProperty(IDictionary<string, object> data,
+          IDictionary<string, object> properties)
+      {
+          if (!properties.ContainsKey(EngagePropertyKeyIp))
+              return data;
+
+          data[EngagePropertyKeyIp] = properties[EngagePropertyKeyIp];
+          properties.Remove(EngagePropertyKeyIp);
+
+          return data;
+      }
   }
 }
