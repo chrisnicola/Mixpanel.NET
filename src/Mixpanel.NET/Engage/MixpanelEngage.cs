@@ -26,17 +26,20 @@ namespace Mixpanel.NET.Engage
         private bool Engage(string distinctId,
                             IDictionary<string, object> setProperties = null,
                             IDictionary<string, object> incrementProperties = null,
-                            string ip = null)
+                            string ip = null,
+                            bool delete = false)
         {
             // Standardize token and time values for Mixpanel
             var dictionary = new Dictionary<string, object> { { "$token", token }, { "$distinct_id", distinctId } };
 
             //enables the possibility to explicitly set $ip outside $set
-            if (!string.IsNullOrWhiteSpace(ip)) dictionary.Add("$ip",ip);
+            if (!string.IsNullOrWhiteSpace(ip)) dictionary.Add("$ip", ip);
 
             if (setProperties != null) dictionary.Add("$set", setProperties);
 
             if (incrementProperties != null) dictionary.Add("$add", incrementProperties);
+
+            if (delete) dictionary.Add("$delete","");
 
             var data = new JavaScriptSerializer().Serialize(dictionary);
 
@@ -49,6 +52,17 @@ namespace Mixpanel.NET.Engage
             return contents == "1";
         }
 
+        // sets the "Address" and "Birthday"
+        // properties of user 13793
+        //{
+        //    "$token": "36ada5b10da39a1347559321baf13063",
+        //    "$distinct_id": "13793",
+        //    "$ip": "123.123.123.123",
+        //    "$set": {
+        //        "Address": "1313 Mockingbird Lane",
+        //        "Birthday": "1948-01-01"
+        //    }
+        //}
         public bool Set(string distinctId, IDictionary<string, object> setProperties, string ip = null)
         {
             return Engage(distinctId, setProperties, ip: ip);
@@ -57,6 +71,17 @@ namespace Mixpanel.NET.Engage
         public bool Increment(string distinctId, IDictionary<string, object> incrementProperties, string ip = null)
         {
             return Engage(distinctId, incrementProperties: incrementProperties, ip: ip);
+        }
+
+        // This removes the user 13793 from Mixpanel
+        //{
+        //    "$token": "36ada5b10da39a1347559321baf13063",
+        //    "$distinct_id": "13793",
+        //    "$delete": ""
+        //}
+        public bool Delete(string distinctId)
+        {
+            return Engage(distinctId,null,null,null,true);
         }
     }
 }
