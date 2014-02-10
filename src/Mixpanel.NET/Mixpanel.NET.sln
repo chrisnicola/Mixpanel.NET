@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mixpanel.NET", "Mixpanel.NET.csproj", "{352023D1-2498-44E2-B2A8-340FA959FEDE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mixpanel.NET.specs", "..\Mixpanel.NET.specs\Mixpanel.NET.specs.csproj", "{08422141-78C4-405A-81C5-926A914B8B40}"
