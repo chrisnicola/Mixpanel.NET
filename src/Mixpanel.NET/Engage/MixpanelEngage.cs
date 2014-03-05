@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Web.Script.Serialization;
-using Mixpanel.NET.Events;
 
 namespace Mixpanel.NET.Engage {
   public class MixpanelEngage : MixpanelClientBase, IEngage {
