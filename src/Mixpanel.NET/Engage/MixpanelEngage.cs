@@ -22,11 +22,13 @@ namespace Mixpanel.NET.Engage {
       _options = options ?? new EngageOptions();
     }
 
-    private bool Engage(string distinctId, IDictionary<string, object> setProperties = null, 
-      IDictionary<string, object> incrementProperties = null) {
+    private bool Engage(string distinctId, IDictionary<string, object> setProperties = null,
+      IDictionary<string, object> incrementProperties = null, string ip = null) {
       // Standardize token and time values for Mixpanel
       var dictionary = 
         new Dictionary<string, object> {{"$token", token}, {"$distinct_id", distinctId}};
+
+      if (!string.IsNullOrWhiteSpace(ip)) dictionary.Add("$ip",ip);
 
       if (setProperties != null) dictionary.Add("$set", setProperties.FormatProperties());
 
@@ -43,12 +45,12 @@ namespace Mixpanel.NET.Engage {
       return contents == "1";
     }
 
-    public bool Set(string distinctId, IDictionary<string, object> setProperties) {
-      return Engage(distinctId, setProperties);
+    public bool Set(string distinctId, IDictionary<string, object> setProperties, string ip = null) {
+      return Engage(distinctId, setProperties, ip: ip);
     }
 
-    public bool Increment(string distinctId, IDictionary<string, object> incrementProperties) {
-      return Engage(distinctId, incrementProperties: incrementProperties);
+    public bool Increment(string distinctId, IDictionary<string, object> incrementProperties, string ip = null) {
+      return Engage(distinctId, incrementProperties: incrementProperties, ip: ip);
     }
   }
 }
