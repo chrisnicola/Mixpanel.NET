@@ -28,9 +28,9 @@ namespace Mixpanel.NET.Engage {
       var dictionary = 
         new Dictionary<string, object> {{"$token", token}, {"$distinct_id", distinctId}};
 
-      if (setProperties != null) dictionary.Add("$set", setProperties);
+      if (setProperties != null) dictionary.Add("$set", setProperties.FormatProperties());
 
-      if (incrementProperties != null) dictionary.Add("$add", incrementProperties);
+      if (incrementProperties != null) dictionary.Add("$add", incrementProperties.FormatProperties());
 
       var data = new JavaScriptSerializer().Serialize(dictionary);
 
