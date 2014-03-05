@@ -11,11 +11,4 @@ namespace Mixpanel.NET
             this.token = token;
         }
     }
-
-    public class MixpanelEngage: MixpanelClientBase
-    {
-        public MixpanelEngage(string token, IMixpanelHttp http = null) : base(token, http)
-        {
-        }
-    }
 }
