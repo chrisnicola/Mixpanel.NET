@@ -16,3 +16,4 @@ _ReSharper.*
 release/
 lib/
 *.nupkg
+.nuget/
