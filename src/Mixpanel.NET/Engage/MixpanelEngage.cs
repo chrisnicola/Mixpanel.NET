@@ -23,14 +23,22 @@ namespace Mixpanel.NET.Engage {
     }
 
     private bool Engage(string distinctId, IDictionary<string, object> setProperties = null, 
-      IDictionary<string, object> incrementProperties = null) {
+      IDictionary<string,object> setOnceProperties = null, IDictionary<string, object> incrementProperties = null,
+      IDictionary<string, object> appendProperties = null, IDictionary<string, object> transactionProperties = null) {
       // Standardize token and time values for Mixpanel
       var dictionary = 
         new Dictionary<string, object> {{"$token", token}, {"$distinct_id", distinctId}};
 
       if (setProperties != null) dictionary.Add("$set", setProperties);
 
+      if (setOnceProperties != null) dictionary.Add("$set_once", setProperties);
+
       if (incrementProperties != null) dictionary.Add("$add", incrementProperties);
+
+      if (appendProperties != null) {
+          appendProperties.Add("$transactions", transactionProperties);
+          dictionary.Add("$append", appendProperties);
+      }
 
       var data = new JavaScriptSerializer().Serialize(dictionary);
 
@@ -47,8 +55,16 @@ namespace Mixpanel.NET.Engage {
       return Engage(distinctId, setProperties);
     }
 
+    public bool SetOnce(string distictId, IDictionary<string, object> setOnceProperties) {
+        return Engage(distictId, setOnceProperties);
+    }
+
     public bool Increment(string distinctId, IDictionary<string, object> incrementProperties) {
-      return Engage(distinctId, incrementProperties: incrementProperties);
+        return Engage(distinctId, incrementProperties: incrementProperties);
+    }
+
+    public bool Append(string distinctId, IDictionary<string, object> appendProperties, IDictionary<string, object> transactionProperties) {
+        return Engage(distinctId, appendProperties: appendProperties, transactionProperties: transactionProperties);
     }
   }
 }
