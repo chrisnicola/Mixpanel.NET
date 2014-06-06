@@ -21,7 +21,7 @@ namespace Mixpanel.NET.Engage {
     }
 
     private bool Engage(string distinctId, IDictionary<string, object> setProperties = null,
-      IDictionary<string, object> incrementProperties = null, string ip = null) {
+      IDictionary<string, object> incrementProperties = null, bool delete = false, string ip = null) {
       // Standardize token and time values for Mixpanel
       var dictionary = 
         new Dictionary<string, object> {{"$token", token}, {"$distinct_id", distinctId}};
@@ -31,6 +31,8 @@ namespace Mixpanel.NET.Engage {
       if (setProperties != null) dictionary.Add("$set", setProperties.FormatProperties());
 
       if (incrementProperties != null) dictionary.Add("$add", incrementProperties.FormatProperties());
+
+      if (delete) dictionary.Add("$delete", string.Empty);
 
       var data = new JavaScriptSerializer().Serialize(dictionary);
 
@@ -43,6 +45,10 @@ namespace Mixpanel.NET.Engage {
       return contents == "1";
     }
 
+      public bool Delete(string distinctId) {
+      return Engage(distinctId, delete: true);
+    }
+
     public bool Set(string distinctId, IDictionary<string, object> setProperties, string ip = null) {
       return Engage(distinctId, setProperties, ip: ip);
     }
@@ -50,5 +56,6 @@ namespace Mixpanel.NET.Engage {
     public bool Increment(string distinctId, IDictionary<string, object> incrementProperties, string ip = null) {
       return Engage(distinctId, incrementProperties: incrementProperties, ip: ip);
     }
+
   }
 }
