@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Web.Script.Serialization;
 using Mixpanel.NET.Events;
+using Newtonsoft.Json;
 
 namespace Mixpanel.NET.Engage {
   public class MixpanelEngage : MixpanelClientBase, IEngage {
@@ -31,8 +31,8 @@ namespace Mixpanel.NET.Engage {
       if (setProperties != null) dictionary.Add("$set", setProperties);
 
       if (incrementProperties != null) dictionary.Add("$add", incrementProperties);
-
-      var data = new JavaScriptSerializer().Serialize(dictionary);
+      
+      var data = JsonConvert.SerializeObject(dictionary);
 
       var values = "data=" + data.Base64Encode();
 

@@ -1,6 +1,6 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Web.Script.Serialization;
 using System.Linq;
 
 namespace Mixpanel.NET.Events
@@ -41,8 +41,8 @@ namespace Mixpanel.NET.Events
             }
 
             var data =
-                new JavaScriptSerializer()
-                .Serialize(new Dictionary<string, object>
+                JsonConvert
+                .SerializeObject(new Dictionary<string, object>
                 {
                     { "event", @event },
                     { "properties", propertyBag }

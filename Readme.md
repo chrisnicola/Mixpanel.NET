@@ -1,3 +1,5 @@
+Added changes for Xamarin and WindowsPhone support.
+
 ## Mixpanel.NET API Integration for .NET
 
 This project provides basic API integration for using Mixpanel from .NET

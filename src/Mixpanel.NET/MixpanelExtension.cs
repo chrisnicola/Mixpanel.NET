@@ -5,8 +5,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Web.Script.Serialization;
 using Mixpanel.NET.Events;
+using Newtonsoft.Json;
 
 namespace Mixpanel.NET {
   public static class MixpanelExtension {
@@ -33,8 +33,8 @@ namespace Mixpanel.NET {
       return new MixpanelEvent(name, propertyBag);
     }
 
-    public static MixpanelEvent ParseEvent(this string data) {
-      return new JavaScriptSerializer().Deserialize<MixpanelEvent>(data);
+    public static MixpanelEvent ParseEvent(this string data) {      
+        return JsonConvert.DeserializeObject<MixpanelEvent>(data);
     }
 
     public static string SplitCamelCase(this string value) {
