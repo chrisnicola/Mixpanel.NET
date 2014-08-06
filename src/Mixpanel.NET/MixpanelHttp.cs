@@ -24,16 +24,27 @@ namespace Mixpanel.NET
     }
 
     public string Post(string uri, string body) {
-      var request = WebRequest.Create(uri);
+      var request = WebRequest.Create(uri + "?" + body);
       request.Method = "POST";
       request.ContentType = "application/x-www-form-urlencoded";
       var bodyBytes = Encoding.UTF8.GetBytes(body);
-      request.GetRequestStream().Write(bodyBytes, 0, bodyBytes.Length);
-      var response = request.GetResponse();
-      var responseStream = response.GetResponseStream();
-      return responseStream == null 
-        ? null
-        : new StreamReader(responseStream).ReadToEnd();
+
+
+      try
+      {
+          var response = request.GetResponse();
+          var responseStream = response.GetResponseStream();
+          return responseStream == null
+            ? null
+            : new StreamReader(responseStream).ReadToEnd();
+      }
+      catch(WebException webException)
+      {
+          System.Diagnostics.Debug.WriteLine(webException);          
+      }
+
+      return string.Empty;
+
     }
   }
 }
