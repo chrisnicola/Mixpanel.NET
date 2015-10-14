@@ -23,8 +23,7 @@ namespace Mixpanel.NET.Engage
 			_options = options ?? new EngageOptions();
 		}
 
-		private bool Engage(string distinctId, IDictionary<string, object> setProperties = null,
-		  IDictionary<string, object> incrementProperties = null, bool delete = false, string ip = null)
+		private bool Engage(string distinctId, string ip, Dictionary<string, object> data)
 		{
 			// Standardize token and time values for Mixpanel
 			var dictionary = new Dictionary<string, object> { { "$token", token }, { "$distinct_id", distinctId } };
@@ -32,19 +31,10 @@ namespace Mixpanel.NET.Engage
 			if (!string.IsNullOrWhiteSpace(ip))
 				dictionary.Add("$ip", ip);
 
-			if (setProperties != null)
-				dictionary.Add("$set", setProperties.FormatProperties());
+			foreach (var pair in data)
+				dictionary.Add(pair.Key, pair.Value);
 
-			if (incrementProperties != null)
-				dictionary.Add("$add", incrementProperties.FormatProperties());
-
-			if (delete)
-				dictionary.Add("$delete", string.Empty);
-
-			var data = new JavaScriptSerializer().Serialize(dictionary);
-
-			var values = "data=" + data.Base64Encode();
-
+			var values = "data=" + new JavaScriptSerializer().Serialize(dictionary).Base64Encode();
 			var contents = _options.UseGet
 			  ? http.Get(Resources.Engage(_options.ProxyUrl), values)
 			  : http.Post(Resources.Engage(_options.ProxyUrl), values);
@@ -54,17 +44,30 @@ namespace Mixpanel.NET.Engage
 
 		public bool Delete(string distinctId)
 		{
-			return Engage(distinctId, delete: true);
+			return Engage(distinctId, null, new Dictionary<string, object>() {
+				{ "$delete", string.Empty }
+			});
 		}
 
 		public bool Set(string distinctId, IDictionary<string, object> setProperties, string ip = null)
 		{
-			return Engage(distinctId, setProperties, ip: ip);
+			return Engage(distinctId, null, new Dictionary<string, object>() {
+				{ "$set", setProperties.FormatProperties() }
+			});
 		}
 
 		public bool Increment(string distinctId, IDictionary<string, object> incrementProperties, string ip = null)
 		{
-			return Engage(distinctId, incrementProperties: incrementProperties, ip: ip);
+			return Engage(distinctId, null, new Dictionary<string, object>() {
+				{ "$add", incrementProperties.FormatProperties() }
+			});
+		}
+
+		public bool Unset(string distinctId, IList<string> properties, string ip = null)
+		{
+			return Engage(distinctId, null, new Dictionary<string, object>() {
+				{ "$unset", properties }
+			});
 		}
 
 	}
