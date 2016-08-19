@@ -56,6 +56,14 @@ namespace Mixpanel.NET.Engage
 			});
 		}
 
+		public bool Append(string distinctId, IDictionary<string, object> appendProperties, string ip = null)
+		{
+			return Engage(distinctId, null, new Dictionary<string, object>()
+			{
+				{ "$append", appendProperties }
+			});
+		}
+
 		public bool Increment(string distinctId, IDictionary<string, object> incrementProperties, string ip = null)
 		{
 			return Engage(distinctId, null, new Dictionary<string, object>() {
