@@ -60,13 +60,23 @@ namespace Mixpanel.NET {
 
     public static IDictionary<string, object> FormatProperties(this IDictionary<string, object> values) {
       var output = new Dictionary<string, object>();
-      foreach (var prop in values) {
-        if (prop.Value is DateTime)
-          output[prop.Key] = ((DateTime)prop.Value).FormatDate();
-        else
-          output[prop.Key] = prop.Value;
+      foreach (var prop in values)
+      {
+	      var value = prop.Value as IDictionary<string, object>;
+	      if (value != null)
+	      {
+		      output[prop.Key] = FormatProperties(value);
+	      }
+		  else if (prop.Value is DateTime)
+	      {
+		      output[prop.Key] = ((DateTime) prop.Value).FormatDate();
+	      }
+	      else
+	      {
+		      output[prop.Key] = prop.Value;
+	      }
       }
-      return output;
+	    return output;
     }
   }
 }
