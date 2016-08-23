@@ -60,7 +60,7 @@ namespace Mixpanel.NET.Engage
 		{
 			return Engage(distinctId, null, new Dictionary<string, object>()
 			{
-				{ "$append", appendProperties }
+				{ "$append", appendProperties.FormatProperties() }
 			});
 		}
 
