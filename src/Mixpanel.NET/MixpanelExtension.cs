@@ -54,8 +54,9 @@ namespace Mixpanel.NET {
     /// https://mixpanel.com/docs/properties-or-segments/property-data-types
     /// http://msdn.microsoft.com/en-us/library/az4se3k1(v=vs.110).aspx
     /// </summary>
-    public static string FormatDate(this DateTime value) {
-      return value.ToString("s");
+    public static string FormatDate(this DateTime value)
+    {
+      return value.Kind == DateTimeKind.Utc ? value.ToString("s") : value.ToUniversalTime().ToString("s");
     }
 
     public static IDictionary<string, object> FormatProperties(this IDictionary<string, object> values) {
