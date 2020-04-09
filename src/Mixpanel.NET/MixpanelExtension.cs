@@ -54,8 +54,17 @@ namespace Mixpanel.NET {
     /// https://mixpanel.com/docs/properties-or-segments/property-data-types
     /// http://msdn.microsoft.com/en-us/library/az4se3k1(v=vs.110).aspx
     /// </summary>
-    public static string FormatDate(this DateTime value) {
-      return value.ToString("s");
+    public static string FormatDate(this DateTime value)
+    {
+      switch (value.Kind)
+      {
+        case DateTimeKind.Utc:
+          return value.ToString("s");
+        case DateTimeKind.Local:
+          return value.ToUniversalTime().ToString("s");
+        default:
+          return value.ToString("s");
+      }
     }
 
     public static IDictionary<string, object> FormatProperties(this IDictionary<string, object> values) {
@@ -67,7 +76,7 @@ namespace Mixpanel.NET {
 	      {
 		      output[prop.Key] = FormatProperties(value);
 	      }
-		  else if (prop.Value is DateTime)
+		    else if (prop.Value is DateTime)
 	      {
 		      output[prop.Key] = ((DateTime) prop.Value).FormatDate();
 	      }
